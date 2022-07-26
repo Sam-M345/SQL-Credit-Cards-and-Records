@@ -1,12 +1,14 @@
---Credit Cards Records and applications Data Exploration 
---Skills Used: Joins, CTE's, Temp Tables, Windows Functions, Aggregate Functions, Creating Views, Converting Data Types
+/*
+Credit Cards Records and applications Data Exploration 
+Skills Used: Joins, CTE's, Temp Tables, Windows Functions, Aggregate Functions, Creating Views, Converting Data Types
+*/
+
+
 
 Select			*
 From			CreditCard..application_record$
 Where			CODE_GENDER='F'
 Order By		6 Desc,7
-
-
 
 
 
@@ -19,12 +21,6 @@ Select			NAME_EDUCATION_TYPE , NAME_FAMILY_STATUS , OCCUPATION_TYPE ,	DAYS_EMPLO
 From			CreditCard..application_record$
 Where			OCCUPATION_TYPE is not null
 Order By		6 Desc
-
-
-
-
-
-
 
 
 
@@ -41,11 +37,6 @@ From			CreditCard..application_record$
 Where			OCCUPATION_TYPE is not null
 Group By		NAME_EDUCATION_TYPE ,  NAME_FAMILY_STATUS , NAME_housing_TYPE
 Order By		6 Desc
-
-
-
-
-
 
 
 
@@ -67,7 +58,6 @@ Order By		6 Desc
 
 
 
-
 --Finding the Average_Years_employed For each occupation type
 
 Select			OCCUPATION_TYPE , Round(-avg(days_employed/365),1) AS  Average_Years_employed
@@ -75,9 +65,6 @@ From			CreditCard..application_record$
 Where			OCCUPATION_TYPE is not null
 Group By		OCCUPATION_TYPE
 Order By		2 Desc
-
-
-
 
 
 
@@ -97,28 +84,16 @@ Order By		4 Desc
 
 
 
-
-
-
-
 -- GLOBAL NUMBERS
 -- In original datASet 365243 days equals to 1000 years which cant be true for DAYS_EMPLOYED
 -- Such data are excluded
 
 
 Select			
-				Sum(AMT_INCOME_TOTAL) AS Sum_Total_Income , Sum(CNT_FAM_MEMBERS) AS Sum_Total_Family_Memebrs,
-				Round(Sum(-DAYS_EMPLOYED / 365),0) AS Sum_Total_Years_Employed
-
+			Sum(AMT_INCOME_TOTAL) AS Sum_Total_Income , Sum(CNT_FAM_MEMBERS) AS Sum_Total_Family_Memebrs,
+			Round(Sum(-DAYS_EMPLOYED / 365),0) AS Sum_Total_Years_Employed
 From			CreditCard..application_record$
 Where			DAYS_EMPLOYED != 365243
-
-
-
-
-
-
-
 
 
 
@@ -134,22 +109,15 @@ on				app.id=crd.id
 
 
 
-
-
-
-
-
-
 -- We Use SQL Partition By to divide the result set into Partitions and perform computation On each subset of Partitioned data.
 -- For each subset bASed On  NAME_income_TYPE ,NAME_EDUCATION_TYPE , NAME_FAMILY_STATUS , NAME_HOUSING_TYPE  we want to claculate rolling_months_balance
 -- That represerensts te Sum total of MONTHS_BALANCE for that Group
 
 
 Select  
-				app.id, NAME_INCOME_TYPE,NAME_EDUCATION_TYPE, NAME_FAMILY_STATUS , NAME_HOUSING_TYPE ,   -MONTHS_BALANCE AS Month_Count,	
-				-Sum(months_balance) Over (Partition By NAME_income_TYPE ,NAME_EDUCATION_TYPE , NAME_FAMILY_STATUS , 
-				NAME_HOUSING_TYPE    ) AS rolling_months_balance
-
+			app.id, NAME_INCOME_TYPE,NAME_EDUCATION_TYPE, NAME_FAMILY_STATUS , NAME_HOUSING_TYPE ,   -MONTHS_BALANCE AS Month_Count,	
+			-Sum(months_balance) Over (Partition By NAME_income_TYPE ,NAME_EDUCATION_TYPE , NAME_FAMILY_STATUS , 
+			NAME_HOUSING_TYPE    ) AS rolling_months_balance
 From			CreditCard..application_record$ AS App
 Join			CreditCard..credit_record$      AS Crd
 on				app.id=crd.id
@@ -190,14 +158,8 @@ Order By		id
 
 
 
-
-
-
-
 -- Create Temporary Table #Creditinfo to perform Calculation On Partition By in previous query
-
-
-							
+		
 DROP Table if exists	#Creditinfo
 Create Table			#Creditinfo
 							(
@@ -209,8 +171,6 @@ Create Table			#Creditinfo
 							month_Count float,
 							rolling_months_balance float
 							)
-
-
 Insert into				#Creditinfo
 
 						Select  app.id, NAME_INCOME_TYPE,NAME_EDUCATION_TYPE, NAME_FAMILY_STATUS , NAME_HOUSING_TYPE ,   -MONTHS_BALANCE AS Month_Count,	
@@ -228,22 +188,11 @@ Where					month_Count!=0
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 -- Creating View to store data 
 -- This can be Used for later visualizations in tableau 
 -- Refresh the source databASe  in the object ecplorer to view the results
 
-Use					CreditCard
+Use				CreditCard
 Go
 
 Create View			CCView_V5 AS
